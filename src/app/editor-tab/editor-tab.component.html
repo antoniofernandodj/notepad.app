@@ -1,0 +1,156 @@
+<style>
+
+    .editor {
+        width: 98vw;
+        height: 42.3vw;
+        padding-left: 5px;
+    }
+
+    .menubar {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .menuitem {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-button {
+        cursor: pointer;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        background-color: white;
+        border-radius: 5px;
+        list-style: none;
+        margin: 0;
+        padding: 0px 0;
+        min-width: 150px;
+        z-index: 1000;
+    }
+
+    .dropdown-menu li {
+        padding: 8px 20px;
+    }
+
+    .dropdown-menu li a {
+        text-decoration: none;
+    }
+
+    .filename-bar {
+        border: 0;
+        font-size: 20px;
+        font-weight: bold;
+        outline: none;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    ._0 {
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+</style>
+
+<input type="text" [(ngModel)]="tab.name" class="filename-bar _0">
+
+<div class="menubar">
+
+  <div class="menuitem">
+
+    <button (click)="openFilesToggle()">
+      <span>Open ▼</span>
+    </button>
+    
+    <ul class="dropdown-menu" *ngIf="openFilesShow">
+      <ng-container *ngIf="tabs.length > 0; else noFiles">
+        <li *ngFor="let tab of tabs">
+          <a href="#" (click)="openFile(tab)">{{ tab.name }}</a>
+        </li>
+      </ng-container>
+      <ng-template #noFiles>
+        <a href="#"><li>No files found!</li></a>
+      </ng-template>
+    </ul>
+
+  </div>
+
+  <div class="menuitem">
+    <button (click)="newTab()">New tab</button>
+  </div>
+
+  <div class="menuitem">
+    <div class="dropdown">
+      <button class="dropdown-button" (click)="configuracoesToggle()">
+        Configurações ▼
+      </button>
+      <ul class="dropdown-menu" *ngIf="configMenuShow">
+        <a href=""><li>Show line numbers</li></a>
+        <a href=""><li>Show right margin</li></a>
+        <a href=""><li>Text wrapping</li></a>
+      </ul>
+    </div>
+  </div>
+
+  <div class="menuitem">
+    <button (click)="generalMenuToggle()">Menu ▼</button>
+    <ul class="dropdown-menu" *ngIf="generalMenuShow">
+      <a href="">
+        <li>
+          <button>Lightstyle</button>
+          <button>Darkstyle</button>
+        </li>
+      </a>
+      <a href="">
+        <li>Autosave 
+            <input
+                type="checkbox"
+                (ngModelChange)="updateAutosave($event)"
+                [ngModel]="(config | async)?.autosave"
+                >
+        </li>
+      </a>
+      <a href=""><li>Save as ...</li></a>
+      <li><hr></li>
+      <a href=""><li>Properties</li></a>
+      <li><hr></li>
+      <a href=""><li>Preferences</li></a>
+      <a href=""><li>Help</li></a>
+      <a href=""><li>About Notepad.app</li></a>
+    </ul>
+  </div>
+
+  <div class="menuitem">
+    <button (click)="saveFile()" [disabled]="!tab.name">Save</button>
+  </div>
+
+  <div class="menuitem">
+    <button (click)="downloadFile()" [disabled]="!saved">Download</button>
+  </div>
+
+  <div class="menuitem">
+    <button (click)="removeFile()">Remove</button>
+  </div>
+
+</div>
+
+
+<textarea
+  (focus)="hideAll()"
+  (keyup)="runAutosave()"
+  (change)="runAutosave()"
+  name=""
+  id=""
+  class="editor" [(ngModel)]="tab.content">
+</textarea>
